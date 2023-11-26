@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve"
-  }
+    "jsx": "react-jsx"
+  },
+  "include": ["src", ".storybook/**/*.{ts,tsx}"],
+  "exclude": ["node_modules"]
 }
