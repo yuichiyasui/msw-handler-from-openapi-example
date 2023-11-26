@@ -10,11 +10,13 @@
     "format:check": "prettier --check .",
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx --fix .",
+    "generate:api": " orval --config ./orval.config.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
     "@tanstack/react-query": "5.8.7",
+    "axios": "1.6.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -36,6 +38,7 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-storybook": "0.6.15",
+    "orval": "6.20.0",
     "prettier": "3.1.0",
     "storybook": "7.5.3",
     "typescript": "5.3.2"
