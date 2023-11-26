@@ -40,9 +40,13 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-storybook": "0.6.15",
+    "msw": "2.0.9",
     "orval": "6.20.0",
     "prettier": "3.1.0",
     "storybook": "7.5.3",
     "typescript": "5.3.2"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
