@@ -5,7 +5,7 @@
     "pnpm": "8.11.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint --ext .ts,.tsx .",
@@ -32,6 +32,9 @@
     "@storybook/react-vite": "7.5.3",
     "@storybook/testing-library": "0.2.2",
     "@tanstack/eslint-plugin-query": "5.8.4",
+    "@testing-library/jest-dom": "6.1.4",
+    "@testing-library/react": "14.1.2",
+    "@testing-library/user-event": "14.5.1",
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.17",
     "@typescript-eslint/eslint-plugin": "6.12.0",
@@ -40,11 +43,13 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-storybook": "0.6.15",
+    "happy-dom": "12.10.3",
     "msw": "2.0.9",
     "orval": "6.20.0",
     "prettier": "3.1.0",
     "storybook": "7.5.3",
-    "typescript": "5.3.2"
+    "typescript": "5.3.2",
+    "vitest": "0.34.6"
   },
   "msw": {
     "workerDirectory": "public"

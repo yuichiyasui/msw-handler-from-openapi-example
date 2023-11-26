@@ -8,7 +8,11 @@ export const PetList = () => {
   }
 
   if (error) {
-    return <p>error</p>;
+    return <p role="alert">error</p>;
+  }
+
+  if (data?.length === 0) {
+    return <p>ペットが登録されていません</p>;
   }
 
   return (

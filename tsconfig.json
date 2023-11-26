@@ -8,8 +8,9 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vitest/globals"]
   },
-  "include": ["src", ".storybook/**/*.{ts,tsx}"],
+  "include": ["src", ".storybook/**/*.{ts,tsx}", "vitest.setup.ts"],
   "exclude": ["node_modules"]
 }
