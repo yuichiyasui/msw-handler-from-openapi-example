@@ -8,6 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "lint": "eslint --ext .ts,.tsx .",
+    "lint:fix": "eslint --ext .ts,.tsx --fix .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -26,6 +28,12 @@
     "@storybook/testing-library": "0.2.2",
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.17",
+    "@typescript-eslint/eslint-plugin": "6.12.0",
+    "@typescript-eslint/parser": "6.12.0",
+    "eslint": "8.54.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-storybook": "0.6.15",
     "prettier": "3.1.0",
     "storybook": "7.5.3",
     "typescript": "5.3.2"
