@@ -33,6 +33,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Pets"
+              example:
+                - id: 0
+                  name: dog
+                  tag: tag1
+                - id: 1
+                  name: cat
+                  tag: tag2
         default:
           description: unexpected error
           content:
@@ -44,6 +51,13 @@ paths:
       operationId: createPets
       tags:
         - pets
+      requestBody:
+        description: Created pet object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPetRequest"
       responses:
         "201":
           description: Null response
@@ -109,4 +123,13 @@ components:
           type: integer
           format: int32
         message:
+          type: string
+    RegisterPetRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        tag:
           type: string

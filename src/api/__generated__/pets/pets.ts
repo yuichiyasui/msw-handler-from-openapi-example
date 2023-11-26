@@ -14,9 +14,15 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import type { Error, ListPetsParams, Pet, Pets } from ".././";
+import type {
+  Error,
+  ListPetsParams,
+  Pet,
+  Pets,
+  RegisterPetRequest,
+} from ".././";
 import { customInstance } from "../../custom-instance";
-import type { ErrorType } from "../../custom-instance";
+import type { ErrorType, BodyType } from "../../custom-instance";
 
 // eslint-disable-next-line
 type SecondParameter<T extends (...args: any) => any> = T extends (
@@ -106,36 +112,46 @@ export const useListPets = <
  * @summary Create a pet
  */
 export const createPets = (
+  registerPetRequest: BodyType<RegisterPetRequest>,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<void>({ url: `/pets`, method: "post" }, options);
+  return customInstance<void>(
+    {
+      url: `/pets`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: registerPetRequest,
+    },
+    options,
+  );
 };
 
 export const getCreatePetsMutationOptions = <
   TError = ErrorType<Error>,
-  TVariables = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createPets>>,
     TError,
-    TVariables,
+    { data: BodyType<RegisterPetRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createPets>>,
   TError,
-  TVariables,
+  { data: BodyType<RegisterPetRequest> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createPets>>,
-    TVariables
-  > = () => {
-    return createPets(requestOptions);
+    { data: BodyType<RegisterPetRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createPets(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -144,7 +160,7 @@ export const getCreatePetsMutationOptions = <
 export type CreatePetsMutationResult = NonNullable<
   Awaited<ReturnType<typeof createPets>>
 >;
-
+export type CreatePetsMutationBody = BodyType<RegisterPetRequest>;
 export type CreatePetsMutationError = ErrorType<Error>;
 
 /**
@@ -152,13 +168,12 @@ export type CreatePetsMutationError = ErrorType<Error>;
  */
 export const useCreatePets = <
   TError = ErrorType<Error>,
-  TVariables = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createPets>>,
     TError,
-    TVariables,
+    { data: BodyType<RegisterPetRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;

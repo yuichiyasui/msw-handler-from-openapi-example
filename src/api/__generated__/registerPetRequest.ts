@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./error";
-export * from "./listPetsParams";
-export * from "./pet";
-export * from "./pets";
-export * from "./registerPetRequest";
+export interface RegisterPetRequest {
+  name: string;
+  tag?: string;
+}
