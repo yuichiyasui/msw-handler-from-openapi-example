@@ -1,83 +1,102 @@
 import jsYaml from "js-yaml";
 import fs from "node:fs";
+import type { OpenAPIV3 } from "openapi-types";
+import prettier from "prettier";
 
-const doc = jsYaml.load(fs.readFileSync("openapi/petstore.yaml", "utf8"));
-const jsonDoc = JSON.parse(JSON.stringify(doc));
-
-const paths = Object.keys(jsonDoc.paths);
-
-let mockData = "";
-
-paths.forEach((path) => {
-  const methods = Object.keys(jsonDoc.paths[path]);
-  methods.forEach((method) => {
-    const operation = jsonDoc.paths[path][method];
-    const operationId = operation.operationId;
-    const responses = Object.keys(operation.responses);
-    responses.forEach((response) => {
-      const responseObj = operation.responses[response];
-      const exampleData = responseObj.content?.["application/json"]?.example;
-      if (!exampleData) return;
-      mockData += `/** "${path}" ${method.toUpperCase()} ${response} */\nconst ${operationId}${response}ResponseMock = ${JSON.stringify(
-        exampleData,
-      )};`;
-    });
-  });
-});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const generateObjectType = (schema: any) => {
-  const properties = schema.properties ?? {};
-  const required = schema.required ?? [];
-  const optional = Object.keys(properties).filter(
-    (key) => !required.includes(key),
-  );
-  const requiredString = required.map(
-    (key) => `${key}: ${convertType(properties[key].type)}`,
-  );
-  const optionalString = optional.map(
-    (key) => `${key}?: ${convertType(properties[key].type)}`,
-  );
-  return `{ ${[...requiredString, ...optionalString].join(";")} }`;
+const loadYaml = (path: string) => {
+  return jsYaml.load(fs.readFileSync(path, "utf8")) as OpenAPIV3.Document;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const generateArrayType = (schema: any) => {
-  const items = schema.items;
-  if (!items) return "[]";
-
-  const typeName = items["$ref"].split("/").pop();
-
-  return `${typeName}[]`;
+const isReferenceObject = (
+  obj:
+    | OpenAPIV3.ReferenceObject
+    | OpenAPIV3.ResponseObject
+    | OpenAPIV3.SchemaObject
+    | undefined,
+): obj is OpenAPIV3.ReferenceObject => {
+  return typeof obj !== "undefined" && "$ref" in obj;
 };
 
-const convertType = (type: string) => {
-  switch (type) {
-    case "integer":
-      return "number";
-    case "array":
-      return "[]";
-    default:
-      return type;
-  }
-};
-
-const generateTypes = () => {
-  const typeNames = Object.keys(jsonDoc.components.schemas);
-  return typeNames.reduce<string>((typesText, typeName) => {
-    const type = jsonDoc.components.schemas[typeName];
-    const schemaType = type.type;
-    if (schemaType === "object") {
-      return typesText + `interface ${typeName} ${generateObjectType(type)};`;
-    }
-    if (schemaType === "array") {
-      return typesText + `type ${typeName} = ${generateArrayType(type)};`;
+const getExampleData = (
+  responses: OpenAPIV3.ResponsesObject,
+  operationId: string,
+) => {
+  const importTypeList = new Set<string>();
+  const responseKeys = Object.keys(responses);
+  const mockText = responseKeys.reduce((exampleData, responseKey) => {
+    const response = responses[responseKey];
+    if (isReferenceObject(response)) {
+      return exampleData;
     }
 
-    return typesText;
+    const mediaTypeObj = response.content?.["application/json"];
+    if (!mediaTypeObj) {
+      return exampleData;
+    }
+
+    const example = mediaTypeObj.example;
+    if (!example) {
+      return exampleData;
+    }
+
+    const schema = mediaTypeObj.schema;
+
+    const type = isReferenceObject(schema) ? schema.$ref.split("/").pop() : "";
+    if (type) {
+      importTypeList.add(type);
+    }
+
+    return (
+      exampleData +
+      `export const ${operationId}${responseKey}ResponseMock${
+        type === "" ? "" : `: ${type}`
+      } = ${JSON.stringify(example)};\n`
+    );
   }, "");
+
+  return {
+    mockText,
+    importTypes: Array.from(importTypeList),
+  };
 };
 
-console.log(generateTypes());
+const generateMockData = async () => {
+  const doc = loadYaml("openapi/petstore.yaml");
+  const paths = Object.keys(doc.paths);
+  const importTypeList = new Set<string>();
 
-fs.writeFileSync("tools/__generated__/mock-data.ts", mockData);
+  const data = paths.reduce((mockData, path) => {
+    let mock = "";
+    const pathObj = doc.paths?.[path];
+    if (typeof pathObj === "undefined") {
+      return mockData;
+    }
+
+    const methods = Object.keys(pathObj);
+    methods.forEach((method) => {
+      const operation = pathObj?.[method];
+      const operationId = operation.operationId;
+      const { importTypes, mockText } = getExampleData(
+        operation.responses,
+        operationId,
+      );
+      mock += mockText;
+      importTypes.forEach((importType) => {
+        importTypeList.add(importType);
+      });
+    });
+
+    return mockData + mock;
+  }, "");
+
+  const importStatement = `import { ${Array.from(importTypeList).join(
+    ", ",
+  )} } from "../__generated__";\n\n`;
+  const mockData = importStatement + data;
+
+  const formatted = await prettier.format(mockData, { parser: "typescript" });
+  const targetPath = "src/api/__mocks__/mock-data.ts";
+  fs.writeFileSync(targetPath, formatted);
+};
+
+generateMockData();
