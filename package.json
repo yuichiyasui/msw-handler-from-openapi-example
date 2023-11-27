@@ -11,6 +11,7 @@
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx --fix .",
     "generate:api": " orval --config ./orval.config.ts",
+    "generate:mock": "vite-node tools/mock-generator.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "mock": "prism mock ./openapi/petstore.yaml -p 8080"
@@ -53,6 +54,7 @@
     "prettier": "3.1.0",
     "storybook": "7.5.3",
     "typescript": "5.3.2",
+    "vite-node": "0.34.6",
     "vitest": "0.34.6"
   },
   "msw": {

@@ -2,6 +2,7 @@ import jsYaml from "js-yaml";
 import fs from "node:fs";
 import type { OpenAPIV3 } from "openapi-types";
 import prettier from "prettier";
+import path from "node:path";
 
 const loadYaml = (path: string) => {
   return jsYaml.load(fs.readFileSync(path, "utf8")) as OpenAPIV3.Document;
@@ -96,7 +97,8 @@ const generateMockData = async () => {
 
   const formatted = await prettier.format(mockData, { parser: "typescript" });
   const targetPath = "src/api/__mocks__/mock-data.ts";
-  fs.writeFileSync(targetPath, formatted);
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  fs.writeFileSync(targetPath, formatted, { encoding: "utf8", flag: "" });
 };
 
 generateMockData();
