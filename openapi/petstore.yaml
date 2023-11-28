@@ -87,6 +87,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Pet"
+              examples:
+                withTag:
+                  value:
+                    id: 0
+                    name: dog
+                    tag: tag1
+                withoutTag:
+                  value:
+                    id: 1
+                    name: cat
         default:
           description: unexpected error
           content:
