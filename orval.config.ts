@@ -15,11 +15,14 @@ export default defineConfig({
           path: "./src/api/custom-instance.ts",
           name: "customInstance",
         },
+        operationName: (operation, _, verb) =>
+          `${operation.operationId}${verb === "get" ? "Query" : "Mutation"}`,
         mock: {
           baseUrl: "http://localhost:8080",
           useExamples: true,
-          delay: 10,
+          delay: 0,
         },
+        useNamedParameters: true,
       },
     },
   },

@@ -16,10 +16,11 @@ import type {
 } from "@tanstack/react-query";
 import type {
   Error,
-  ListPetsParams,
+  ListPetsQueryParams,
   Pet,
   Pets,
   RegisterPetRequest,
+  ShowPetByIdQueryPathParameters,
 } from ".././";
 import { customInstance } from "../../custom-instance";
 import type { ErrorType, BodyType } from "../../custom-instance";
@@ -35,8 +36,8 @@ type SecondParameter<T extends (...args: any) => any> = T extends (
 /**
  * @summary List all pets
  */
-export const listPets = (
-  params?: ListPetsParams,
+export const listPetsQuery = (
+  params?: ListPetsQueryParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -46,58 +47,58 @@ export const listPets = (
   );
 };
 
-export const getListPetsQueryKey = (params?: ListPetsParams) => {
+export const getListPetsQueryQueryKey = (params?: ListPetsQueryParams) => {
   return [`/pets`, ...(params ? [params] : [])] as const;
 };
 
-export const getListPetsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listPets>>,
+export const getListPetsQueryQueryOptions = <
+  TData = Awaited<ReturnType<typeof listPetsQuery>>,
   TError = ErrorType<Error>,
 >(
-  params?: ListPetsParams,
+  params?: ListPetsQueryParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listPets>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof listPetsQuery>>, TError, TData>
     >;
     request?: SecondParameter<typeof customInstance>;
   },
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getListPetsQueryKey(params);
+  const queryKey = queryOptions?.queryKey ?? getListPetsQueryQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPets>>> = ({
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPetsQuery>>> = ({
     signal,
-  }) => listPets(params, requestOptions, signal);
+  }) => listPetsQuery(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listPets>>,
+    Awaited<ReturnType<typeof listPetsQuery>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type ListPetsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listPets>>
+export type ListPetsQueryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listPetsQuery>>
 >;
-export type ListPetsQueryError = ErrorType<Error>;
+export type ListPetsQueryQueryError = ErrorType<Error>;
 
 /**
  * @summary List all pets
  */
-export const useListPets = <
-  TData = Awaited<ReturnType<typeof listPets>>,
+export const useListPetsQuery = <
+  TData = Awaited<ReturnType<typeof listPetsQuery>>,
   TError = ErrorType<Error>,
 >(
-  params?: ListPetsParams,
+  params?: ListPetsQueryParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listPets>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof listPetsQuery>>, TError, TData>
     >;
     request?: SecondParameter<typeof customInstance>;
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = getListPetsQueryOptions(params, options);
+  const queryOptions = getListPetsQueryQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -111,7 +112,7 @@ export const useListPets = <
 /**
  * @summary Create a pet
  */
-export const createPets = (
+export const createPetsMutation = (
   registerPetRequest: BodyType<RegisterPetRequest>,
   options?: SecondParameter<typeof customInstance>,
 ) => {
@@ -126,19 +127,19 @@ export const createPets = (
   );
 };
 
-export const getCreatePetsMutationOptions = <
+export const getCreatePetsMutationMutationOptions = <
   TError = ErrorType<Error>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createPets>>,
+    Awaited<ReturnType<typeof createPetsMutation>>,
     TError,
     { data: BodyType<RegisterPetRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof createPets>>,
+  Awaited<ReturnType<typeof createPetsMutation>>,
   TError,
   { data: BodyType<RegisterPetRequest> },
   TContext
@@ -146,47 +147,47 @@ export const getCreatePetsMutationOptions = <
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createPets>>,
+    Awaited<ReturnType<typeof createPetsMutation>>,
     { data: BodyType<RegisterPetRequest> }
   > = (props) => {
     const { data } = props ?? {};
 
-    return createPets(data, requestOptions);
+    return createPetsMutation(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type CreatePetsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createPets>>
+export type CreatePetsMutationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPetsMutation>>
 >;
-export type CreatePetsMutationBody = BodyType<RegisterPetRequest>;
-export type CreatePetsMutationError = ErrorType<Error>;
+export type CreatePetsMutationMutationBody = BodyType<RegisterPetRequest>;
+export type CreatePetsMutationMutationError = ErrorType<Error>;
 
 /**
  * @summary Create a pet
  */
-export const useCreatePets = <
+export const useCreatePetsMutation = <
   TError = ErrorType<Error>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createPets>>,
+    Awaited<ReturnType<typeof createPetsMutation>>,
     TError,
     { data: BodyType<RegisterPetRequest> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }) => {
-  const mutationOptions = getCreatePetsMutationOptions(options);
+  const mutationOptions = getCreatePetsMutationMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
 /**
  * @summary Info for a specific pet
  */
-export const showPetById = (
-  petId: string,
+export const showPetByIdQuery = (
+  { petId }: ShowPetByIdQueryPathParameters,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -196,29 +197,36 @@ export const showPetById = (
   );
 };
 
-export const getShowPetByIdQueryKey = (petId: string) => {
+export const getShowPetByIdQueryQueryKey = ({
+  petId,
+}: ShowPetByIdQueryPathParameters) => {
   return [`/pets/${petId}`] as const;
 };
 
-export const getShowPetByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof showPetById>>,
+export const getShowPetByIdQueryQueryOptions = <
+  TData = Awaited<ReturnType<typeof showPetByIdQuery>>,
   TError = ErrorType<Error>,
 >(
-  petId: string,
+  { petId }: ShowPetByIdQueryPathParameters,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof showPetById>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof showPetByIdQuery>>,
+        TError,
+        TData
+      >
     >;
     request?: SecondParameter<typeof customInstance>;
   },
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getShowPetByIdQueryKey(petId);
+  const queryKey =
+    queryOptions?.queryKey ?? getShowPetByIdQueryQueryKey({ petId });
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof showPetById>>> = ({
-    signal,
-  }) => showPetById(petId, requestOptions, signal);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof showPetByIdQuery>>
+  > = ({ signal }) => showPetByIdQuery({ petId }, requestOptions, signal);
 
   return {
     queryKey,
@@ -226,33 +234,37 @@ export const getShowPetByIdQueryOptions = <
     enabled: !!petId,
     ...queryOptions,
   } as UseQueryOptions<
-    Awaited<ReturnType<typeof showPetById>>,
+    Awaited<ReturnType<typeof showPetByIdQuery>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type ShowPetByIdQueryResult = NonNullable<
-  Awaited<ReturnType<typeof showPetById>>
+export type ShowPetByIdQueryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof showPetByIdQuery>>
 >;
-export type ShowPetByIdQueryError = ErrorType<Error>;
+export type ShowPetByIdQueryQueryError = ErrorType<Error>;
 
 /**
  * @summary Info for a specific pet
  */
-export const useShowPetById = <
-  TData = Awaited<ReturnType<typeof showPetById>>,
+export const useShowPetByIdQuery = <
+  TData = Awaited<ReturnType<typeof showPetByIdQuery>>,
   TError = ErrorType<Error>,
 >(
-  petId: string,
+  { petId }: ShowPetByIdQueryPathParameters,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof showPetById>>, TError, TData>
+      UseQueryOptions<
+        Awaited<ReturnType<typeof showPetByIdQuery>>,
+        TError,
+        TData
+      >
     >;
     request?: SecondParameter<typeof customInstance>;
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = getShowPetByIdQueryOptions(petId, options);
+  const queryOptions = getShowPetByIdQueryQueryOptions({ petId }, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

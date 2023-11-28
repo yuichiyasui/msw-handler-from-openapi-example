@@ -40,12 +40,15 @@ paths:
                 - id: 1
                   name: cat
                   tag: tag2
-        default:
+        500:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                code: 500
+                message: something bad happened
     post:
       summary: Create a pet
       operationId: createPets

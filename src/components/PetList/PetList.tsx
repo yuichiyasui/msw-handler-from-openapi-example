@@ -1,7 +1,7 @@
-import { useListPets } from "../../api/__generated__/pets/pets";
+import { useListPetsQuery } from "../../api/__generated__/pets/pets";
 
 export const PetList = () => {
-  const { data, error, isLoading } = useListPets();
+  const { data, error, isLoading } = useListPetsQuery();
 
   if (isLoading) {
     return <p>loading...</p>;

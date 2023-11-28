@@ -1,12 +1,12 @@
 import { FormEvent, useState } from "react";
-import { useCreatePets } from "../../api/__generated__/pets/pets";
+import { useCreatePetsMutation } from "../../api/__generated__/pets/pets";
 
 export const PetRegistrationForm = () => {
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { mutateAsync } = useCreatePets();
+  const { mutateAsync } = useCreatePetsMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

@@ -6,9 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./error";
-export * from "./listPetsQueryParams";
-export * from "./pet";
-export * from "./pets";
-export * from "./registerPetRequest";
-export * from "./showPetByIdQueryPathParameters";
+export type ShowPetByIdQueryPathParameters = {
+  petId: string;
+};
