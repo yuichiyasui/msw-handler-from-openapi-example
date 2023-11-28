@@ -9,10 +9,16 @@ export default defineConfig({
       prettier: true,
       clean: true,
       client: "react-query",
+      mock: true,
       override: {
         mutator: {
           path: "./src/api/custom-instance.ts",
           name: "customInstance",
+        },
+        mock: {
+          baseUrl: "http://localhost:8080",
+          useExamples: true,
+          delay: 10,
         },
       },
     },
