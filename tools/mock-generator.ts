@@ -1,8 +1,9 @@
-import jsYaml from "js-yaml";
 import fs from "node:fs";
+import path from "node:path";
+
+import jsYaml from "js-yaml";
 import type { OpenAPIV3 } from "openapi-types";
 import prettier from "prettier";
-import path from "node:path";
 
 const loadYaml = (path: string) =>
   jsYaml.load(fs.readFileSync(path, "utf8")) as OpenAPIV3.Document;
@@ -36,7 +37,7 @@ const getExampleDataFromExamples = (
     .map(([key, example]) => {
       return `export const ${prefix}${capitalizeFirstLetter(key)}ResponseMock ${
         type ? `:${type}` : ""
-      } = ${JSON.stringify(example.value)};\n`;
+      } = ${JSON.stringify(example.value)};\n\n`;
     })
     .join("");
 };
@@ -70,7 +71,7 @@ const getExampleData = (
         type && acc.importTypes.add(type);
         acc.mockText += `export const ${operationId}${responseKey}ResponseMock${
           type === "" ? "" : `: ${type}`
-        } = ${JSON.stringify(example)};\n`;
+        } = ${JSON.stringify(example)};\n\n`;
       }
 
       return acc;
@@ -79,36 +80,44 @@ const getExampleData = (
   );
 };
 
-const generateMockData = async () => {
-  const doc = loadYaml("openapi/petstore.yaml");
-  const paths = Object.keys(doc.paths);
+const getMockText = (paths: OpenAPIV3.PathsObject) => {
+  const { importTypeList, mockText } = Object.entries(paths)
+    .filter((kv): kv is [string, NonNullable<(typeof kv)[1]>] => {
+      const [, pathObj] = kv;
+      return typeof pathObj !== "undefined";
+    })
+    .reduce(
+      (acc, [, pathObj]) => {
+        const methods = Object.keys(pathObj);
+        methods.forEach((method) => {
+          const operation = pathObj?.[method];
+          const operationId = operation.operationId;
+          const { importTypes, mockText } = getExampleData(
+            operation.responses,
+            operationId,
+          );
+          acc.mockText += mockText;
+          importTypes.forEach((importType) =>
+            acc.importTypeList.add(importType),
+          );
+        });
 
-  const { mockText, importTypeList } = paths.reduce(
-    (acc, path) => {
-      const pathObj = doc.paths?.[path];
-      if (typeof pathObj === "undefined") return acc;
-
-      const methods = Object.keys(pathObj);
-      methods.forEach((method) => {
-        const operation = pathObj?.[method];
-        const operationId = operation.operationId;
-        const { importTypes, mockText } = getExampleData(
-          operation.responses,
-          operationId,
-        );
-        acc.mockText += mockText;
-        importTypes.forEach((importType) => acc.importTypeList.add(importType));
-      });
-
-      return acc;
-    },
-    { mockText: "", importTypeList: new Set<string>() },
-  );
+        return acc;
+      },
+      { mockText: "", importTypeList: new Set<string>() },
+    );
 
   const importStatement = `import { ${Array.from(importTypeList).join(
     ", ",
-  )} } from "../__generated__";\n\n`;
-  const formatted = await prettier.format(importStatement + mockText, {
+  )} } from "../__generated__";`;
+
+  return `${importStatement}\n\n${mockText}`;
+};
+
+const generateMockData = async () => {
+  const doc = loadYaml("openapi/petstore.yaml");
+  const mockText = getMockText(doc.paths);
+  const formatted = await prettier.format(mockText, {
     parser: "typescript",
   });
   const targetPath = "src/api/__mocks__/mock-data.ts";
